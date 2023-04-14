@@ -131,10 +131,16 @@ function downloadIfNot(url, filName = last(url)){
 function download(url, fileName = last(url)){
     const file = fs.createWriteStream(fileName);
 
-    return https.get(url, response => {
-        response.pipe(file);
-        file.on("finish", () => file.close());
-    });
+    return new Promise((resolve, reject) => {
+        https.get(url, response => {
+            response.pipe(file);
+            file.on("finish", () => {
+                file.close();
+                resolve(file);
+            });
+            file.on('error', reject);
+        }, reject);
+    })
 }
 
 function isUrlDownloaded(url, filName = last(url)){
@@ -211,7 +217,11 @@ function setFileName(name){
 }
 
 function pasteIfUrl(){
-    const data = ncp.readSync();
+    try{
+        const data = ncp.readSync();
 
-    if( isUrl( data ) ) window.url.value = data;
+        if( isUrl( data ) ) window.url.value = data;
+    } catch (e){
+        console.log(e.message);
+    }
 }
