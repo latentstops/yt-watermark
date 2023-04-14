@@ -1,19 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
-    <link href="./styles.css" rel="stylesheet">
-    <title>Hello World!</title>
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; styles-src 'self' 'unsafe-inline'"> -->
+    <link href="./styles/bootstrap.min.css" rel="stylesheet">
+    <link href="./styles/styles.css" rel="stylesheet">
+    <title>YT Watermark</title>
   </head>
   <body>
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
+  <div class="overlay" id="loading" >
+    <div class="d-flex justify-content-center">
+      <div class="spinner-border" role="status"></div>
+    </div>
+  </div>
+  <div class="container my-3">
+    <div class="col-lg">
+      <form class="needs-validation" novalidate="" onsubmit="go(event)" onchange="keepUserParams(event)" onmouseenter="pasteIfUrl()">
+        <div class="row g-3">
+          <div class="col-12">
+            <label for="url" class="form-label">Youtube URL</label>
+            <input type="text" class="form-control" id="url" placeholder="URL">
+            <small id="filename" class="form-text text-muted">File name: empty</small>
+          </div>
 
-    <!-- You can also require other files to run in this process -->
-    <script src="./renderer.js"></script>
+          <div class="col-sm-6">
+            <label for="gap" class="form-label">Gap</label>
+            <input type="number" class="form-control" id="gap" value="0.1" step="0.1">
+          </div>
+
+          <div class="col-sm-6">
+            <label for="scale" class="form-label">Scale</label>
+            <input type="number" class="form-control" id="scale" value="0.1" step="0.1">
+          </div>
+
+          <div class="col-md-12">
+            <span class="fw-semibold">Watermark</span>
+
+          </div>
+          <div class="col-sm-6">
+            <label for="watermark" class="form-label">Select</label>
+            <select class="form-select" id="watermark" required=""></select>
+          </div>
+          <div class="col-sm-6">
+            <label for="watermark_file" class="form-label">Upload and use</label>
+            <input class="form-control" type="file" id="watermark_file">
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <button class="w-100 btn btn-primary btn-lg" type="submit">GO!</button>
+
+        <hr class="my-4">
+
+        <div class="row">
+          <div class="col-sm-6">
+            <input type="button" class="w-100 btn btn-secondary" onclick="reload()" value="Reload">
+          </div>
+          <div class="col-sm-6">
+            <input type="button" class="w-100 btn btn-secondary" onclick="openWorkspace()" value="Open Workspace">
+          </div>
+        </div>
+        <div class="col-md-12">
+          <small id="info" class="form-text text-muted"></small>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="./renderer.js"></script>
   </body>
 </html>
