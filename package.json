@@ -1,6 +1,6 @@
 {
   "name": "yt-watermark",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Download video and set watermark on it.",
   "main": "main.js",
   "scripts": {
@@ -14,7 +14,10 @@
     "download",
     "watermark"
   ],
-  "files": ["workspace/**", "bin"],
+  "files": [
+    "workspace/**",
+    "bin"
+  ],
   "author": "Varuzhan Harutyunyan",
   "license": "CC0-1.0",
   "dependencies": {
@@ -37,12 +40,12 @@
       {
         "from": "../../bin",
         "to": "../bin"
-      },{
+      },
+      {
         "from": "../../workspace",
         "to": "../workspace"
       }
     ],
-
     "asar": false
   }
 }
