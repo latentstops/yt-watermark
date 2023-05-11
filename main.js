@@ -8,6 +8,7 @@ function createWindow () {
     width: 600,
     height: 600,
     resizable: false,
+    autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,

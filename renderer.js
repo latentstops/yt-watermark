@@ -1,10 +1,3 @@
-/**
- * This file is loaded via the <script> tag in the index.html file and will
- * be executed in the renderer process for that window. No Node.js APIs are
- * available in this process because `nodeIntegration` is turned off and
- * `contextIsolation` is turned on. Use the contextBridge API in `preload.js`
- * to expose Node.js functionality from the main process.
- */
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
@@ -15,6 +8,18 @@ const isUrl = require('is-url');
 const extractZip = require('extract-zip');
 
 const exec = util.promisify(require('child_process').exec);
+
+
+const options = { recursive: true };
+const BIN = path.resolve( 'bin');
+const WORKSPACE = path.resolve('workspace');
+const DIST_WORKSPACE_VIDEOS = path.resolve(WORKSPACE, 'videos');
+const DIST_WORKSPACE_WATERMARKS = path.resolve(WORKSPACE, 'watermarks');
+
+fs.mkdirSync(BIN, options);
+fs.mkdirSync(WORKSPACE, options);
+fs.mkdirSync(DIST_WORKSPACE_VIDEOS, options);
+fs.mkdirSync(DIST_WORKSPACE_WATERMARKS, options);
 
 const CLI_DIRNAME = `bin`;
 const CLI_DIR_PATH = path.resolve(CLI_DIRNAME);
@@ -43,13 +48,13 @@ const ytdlp = createCli(YTDLP_PATH);
     await setupCLIs();
     setupUserParams();
     setupWatermarks();
-    window.loading.innerHTML = '';
+    window.loading.remove();
 })();
 
 async function go(e){
     e.preventDefault();
-    try{
-        setInfo('');
+    try {
+        setInfo();
 
         let {url, gap, scale, watermark} = processParams();
 
@@ -204,7 +209,7 @@ function reload(){
     location.reload();
 }
 
-function setInfo(txt){
+function setInfo(txt = ''){
     window.info.innerHTML = txt;
 }
 
