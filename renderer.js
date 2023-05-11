@@ -40,6 +40,7 @@ const FFMPEG_PATH = path.resolve(FFMPEG_DIR_PATH, `ffmpeg.exe`);
 
 const PARAMS = ['url', 'gap', 'scale', 'watermark'];
 const DEFAULTS = { gap: '0.1', scale: '0.1' };
+const VIDEO_FORMAT = 'mp4';
 
 const ffmpeg = createCli(FFMPEG_PATH);
 const ytdlp = createCli(YTDLP_PATH);
@@ -89,7 +90,8 @@ function processWatermarkFile(fileInput){
 
 async function applyWatermark({url, watermark, gap, scale}) {
     setInfo('Extracting video file name -> ');
-    const fileName = await ytdlp(`-S res,ext:mp4:m4a --recode mp4 --restrict-filenames --print filename ${url}`).then(sanitize);
+    const baseFileName = await ytdlp(`-S res,ext:${VIDEO_FORMAT}:m4a --recode ${VIDEO_FORMAT} --restrict-filenames --print filename ${url}`).then(sanitize).then(getBaseFileName);
+    const fileName = `${baseFileName}.${VIDEO_FORMAT}`;
     const filePath = path.resolve(VIDEOS_DIR_PATH, fileName);
 
     setFileName(`File name: ${fileName} `);
@@ -229,4 +231,7 @@ function pasteIfUrl(){
     } catch (e){
         console.log(e.message);
     }
+}
+function getBaseFileName(fileName){
+    return fileName.substring(0, fileName.indexOf(path.extname(fileName)));
 }
