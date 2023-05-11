@@ -32,7 +32,7 @@ const YTDLP_URL = 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-
 const YTDLP_FILENAME = last(YTDLP_URL);
 const YTDLP_PATH = path.resolve(CLI_DIRNAME, YTDLP_FILENAME);
 
-const FFMPEG_ZIP_URL = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip';
+const FFMPEG_ZIP_URL = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2023-05-11-14-20/ffmpeg-N-110555-gceb050427c-win64-gpl.zip';
 const FFMPEG_ZIP_FILENAME = last(FFMPEG_ZIP_URL);
 const FFMPEG_ZIP_FILEPATH = path.resolve(CLI_DIRNAME, FFMPEG_ZIP_FILENAME);
 const FFMPEG_DIR_PATH = path.resolve(CLI_DIRNAME, lastDir(FFMPEG_ZIP_FILENAME), 'bin');
@@ -90,7 +90,8 @@ function processWatermarkFile(fileInput){
 
 async function applyWatermark({url, watermark, gap, scale}) {
     setInfo('Extracting video file name -> ');
-    const baseFileName = await ytdlp(`-S res,ext:${VIDEO_FORMAT}:m4a --recode ${VIDEO_FORMAT} --restrict-filenames --print filename ${url}`).then(sanitize).then(getBaseFileName);
+    const ytdlpCommandArgs = `-S res,ext:${VIDEO_FORMAT}:m4a --recode ${VIDEO_FORMAT} --restrict-filenames --print filename ${url}`;
+    const baseFileName = await ytdlp(ytdlpCommandArgs).then(sanitize).then(getBaseFileName);
     const fileName = `${baseFileName}.${VIDEO_FORMAT}`;
     const filePath = path.resolve(VIDEOS_DIR_PATH, fileName);
 
