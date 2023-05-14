@@ -32,7 +32,7 @@ const YTDLP_URL = 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-
 const YTDLP_FILENAME = last(YTDLP_URL);
 const YTDLP_PATH = path.resolve(CLI_DIRNAME, YTDLP_FILENAME);
 
-const FFMPEG_ZIP_URL = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2023-05-11-14-20/ffmpeg-N-110555-gceb050427c-win64-gpl.zip';
+const FFMPEG_ZIP_URL = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip';
 const FFMPEG_ZIP_FILENAME = last(FFMPEG_ZIP_URL);
 const FFMPEG_ZIP_FILEPATH = path.resolve(CLI_DIRNAME, FFMPEG_ZIP_FILENAME);
 const FFMPEG_DIR_PATH = path.resolve(CLI_DIRNAME, lastDir(FFMPEG_ZIP_FILENAME), 'bin');
@@ -59,7 +59,7 @@ async function go(e){
 
         let {url, gap, scale, watermark} = processParams();
 
-        const watermarkFilePath = processWatermarkFile(window.watermark_file);
+        const watermarkFilePath = processWatermarkFile(window["watermark_file"]);
         const watermarkSelectPath = path.resolve(WATERMARKS_DIR_PATH, watermark);
 
         watermark = watermarkFilePath || watermarkSelectPath;
@@ -236,3 +236,11 @@ function pasteIfUrl(){
 function getBaseFileName(fileName){
     return fileName.substring(0, fileName.indexOf(path.extname(fileName)));
 }
+
+module.exports = {
+    go,
+    reload,
+    pasteIfUrl,
+    openWorkspace,
+    keepUserParams
+};
