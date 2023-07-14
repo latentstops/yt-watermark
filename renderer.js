@@ -7,6 +7,7 @@ const ncp = require('node-clipboardy');
 const isUrl = require('is-url');
 const extractZip = require('extract-zip');
 const {shell} = require('electron');
+const os = require('os');
 
 const exec = util.promisify(require('child_process').exec);
 
@@ -29,11 +30,18 @@ const WORKSPACE_DIR_PATH = path.resolve(WORKSPACE_DIRNAME);
 const WATERMARKS_DIR_PATH = path.resolve(WORKSPACE_DIRNAME, 'watermarks');
 const VIDEOS_DIR_PATH = path.resolve(WORKSPACE_DIRNAME, 'videos');
 
-const YTDLP_URL = 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp';
+const POSTFIX = os.platform() === 'win32' ? ".exe" : "";
+const YTDLP_URL = `https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp${POSTFIX}`;
 const YTDLP_FILENAME = last(YTDLP_URL);
 const YTDLP_PATH = path.resolve(CLI_DIRNAME, YTDLP_FILENAME);
 
-const FFMPEG_ZIP_URL = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip';
+const FFMPEG_URL_PLATFORM_MAP = {
+    win32: os.arch().replace('x','win'),
+    darwin: os.arch().replace('x','linux'),
+    linux: os.arch().replace('x','linux')
+};
+const FFMPEG_ZIP_URL_OS_ARCH = FFMPEG_URL_PLATFORM_MAP[os.platform()];
+const FFMPEG_ZIP_URL = `https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-${FFMPEG_ZIP_URL_OS_ARCH}-gpl.zip`;
 const FFMPEG_ZIP_FILENAME = last(FFMPEG_ZIP_URL);
 const FFMPEG_ZIP_FILEPATH = path.resolve(CLI_DIRNAME, FFMPEG_ZIP_FILENAME);
 const FFMPEG_DIR_PATH = path.resolve(CLI_DIRNAME, lastDir(FFMPEG_ZIP_FILENAME), 'bin');
