@@ -36,9 +36,9 @@ const YTDLP_FILENAME = last(YTDLP_URL);
 const YTDLP_PATH = path.resolve(CLI_DIRNAME, YTDLP_FILENAME);
 
 const FFMPEG_URL_PLATFORM_MAP = {
-    win32: os.arch().replace('x','win'),
-    darwin: os.arch().replace('x','linux'),
-    linux: os.arch().replace('x','linux')
+    win32: "win" + os.arch().replace('x',''),
+    darwin: "linux" + os.arch().replace('x',''),
+    linux: "linux" + os.arch().replace('x',''),
 };
 const FFMPEG_ZIP_URL_OS_ARCH = FFMPEG_URL_PLATFORM_MAP[os.platform()];
 const FFMPEG_ZIP_URL = `https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-${FFMPEG_ZIP_URL_OS_ARCH}-gpl.zip`;
