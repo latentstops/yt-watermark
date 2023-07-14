@@ -6,6 +6,7 @@ const sanitize = require('sanitize-filename');
 const ncp = require('node-clipboardy');
 const isUrl = require('is-url');
 const extractZip = require('extract-zip');
+const {shell} = require('electron');
 
 const exec = util.promisify(require('child_process').exec);
 
@@ -28,7 +29,7 @@ const WORKSPACE_DIR_PATH = path.resolve(WORKSPACE_DIRNAME);
 const WATERMARKS_DIR_PATH = path.resolve(WORKSPACE_DIRNAME, 'watermarks');
 const VIDEOS_DIR_PATH = path.resolve(WORKSPACE_DIRNAME, 'videos');
 
-const YTDLP_URL = 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe';
+const YTDLP_URL = 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp';
 const YTDLP_FILENAME = last(YTDLP_URL);
 const YTDLP_PATH = path.resolve(CLI_DIRNAME, YTDLP_FILENAME);
 
@@ -205,7 +206,7 @@ function c(tag, options){
 }
 
 function openWorkspace(){
-    return exec(`explorer ${WORKSPACE_DIR_PATH}`);
+    return shell.openPath(WORKSPACE_DIR_PATH);
 }
 
 function reload(){
