@@ -11,6 +11,8 @@ const os = require('os');
 
 const exec = util.promisify(require('child_process').exec);
 
+const OS_PLATFORM = os.platform();
+const OS_PLATFORM_IS_WIN = OS_PLATFORM === "win32";
 
 const options = { recursive: true };
 const BIN = path.resolve( 'bin');
@@ -30,7 +32,7 @@ const WORKSPACE_DIR_PATH = path.resolve(WORKSPACE_DIRNAME);
 const WATERMARKS_DIR_PATH = path.resolve(WORKSPACE_DIRNAME, 'watermarks');
 const VIDEOS_DIR_PATH = path.resolve(WORKSPACE_DIRNAME, 'videos');
 
-const POSTFIX = os.platform() === 'win32' ? ".exe" : "";
+const POSTFIX = OS_PLATFORM_IS_WIN ? ".exe" : "";
 const YTDLP_URL = `https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp${POSTFIX}`;
 const YTDLP_FILENAME = last(YTDLP_URL);
 const YTDLP_PATH = path.resolve(CLI_DIRNAME, YTDLP_FILENAME);
@@ -40,8 +42,10 @@ const FFMPEG_URL_PLATFORM_MAP = {
     darwin: "linux" + os.arch().replace('x',''),
     linux: "linux" + os.arch().replace('x',''),
 };
-const FFMPEG_ZIP_URL_OS_ARCH = FFMPEG_URL_PLATFORM_MAP[os.platform()];
-const FFMPEG_ZIP_URL = `https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-${FFMPEG_ZIP_URL_OS_ARCH}-gpl.zip`;
+const FFMPEG_ZIP_URL_OS_ARCH = FFMPEG_URL_PLATFORM_MAP[OS_PLATFORM];
+const FFMPEG_URL_ARCHIVE_FILE_EXTENSION = OS_PLATFORM_IS_WIN ? `.zip` : '.tar.xz';
+const FFMPEG_URL_ARCHIVE_FILE_NAME = `${FFMPEG_ZIP_URL_OS_ARCH}-gpl${FFMPEG_URL_ARCHIVE_FILE_EXTENSION}`;
+const FFMPEG_ZIP_URL = `https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-${FFMPEG_URL_ARCHIVE_FILE_NAME}`;
 const FFMPEG_ZIP_FILENAME = last(FFMPEG_ZIP_URL);
 const FFMPEG_ZIP_FILEPATH = path.resolve(CLI_DIRNAME, FFMPEG_ZIP_FILENAME);
 const FFMPEG_DIR_PATH = path.resolve(CLI_DIRNAME, lastDir(FFMPEG_ZIP_FILENAME), 'bin');
@@ -131,7 +135,7 @@ async function setupCLIs(){
 
     if(fs.existsSync(FFMPEG_PATH)) return;
 
-    await extractZip(FFMPEG_ZIP_FILEPATH, { dir: CLI_DIR_PATH });
+    await extractArchive(FFMPEG_ZIP_FILEPATH, { dir: CLI_DIR_PATH });
 }
 
 function downloadAsCliIfNot(url){
@@ -244,6 +248,11 @@ function pasteIfUrl(){
 }
 function getBaseFileName(fileName){
     return fileName.substring(0, fileName.indexOf(path.extname(fileName)));
+}
+
+function extractArchive(fileName, { dir }){
+    if(OS_PLATFORM_IS_WIN) return extractZip(...arguments);
+    else return exec(`tar -xvf ${fileName} -C ${dir}`);
 }
 
 module.exports = {
