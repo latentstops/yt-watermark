@@ -49,7 +49,7 @@ const FFMPEG_ZIP_URL = `https://github.com/BtbN/FFmpeg-Builds/releases/download/
 const FFMPEG_ZIP_FILENAME = last(FFMPEG_ZIP_URL);
 const FFMPEG_ZIP_FILEPATH = path.resolve(CLI_DIRNAME, FFMPEG_ZIP_FILENAME);
 const FFMPEG_DIR_PATH = path.resolve(CLI_DIRNAME, lastDir(FFMPEG_ZIP_FILENAME), 'bin');
-const FFMPEG_PATH = path.resolve(FFMPEG_DIR_PATH, `ffmpeg.exe`);
+const FFMPEG_PATH = path.resolve(FFMPEG_DIR_PATH, `ffmpeg${POSTFIX}`);
 
 const PARAMS = ['url', 'gap', 'scale', 'watermark'];
 const DEFAULTS = { gap: '0.1', scale: '0.1' };
@@ -138,9 +138,14 @@ async function setupCLIs(){
     await extractArchive(FFMPEG_ZIP_FILEPATH, { dir: CLI_DIR_PATH });
 }
 
-function downloadAsCliIfNot(url){
+async function downloadAsCliIfNot(url){
     const fileName = path.resolve( CLI_DIRNAME, last(url) );
-    return downloadIfNot(url, fileName);
+
+    await downloadIfNot(url, fileName);
+
+    if(!OS_PLATFORM_IS_WIN){
+        return exec(`chmod a+rx ${fileName}`);
+    }
 }
 
 function downloadIfNot(url, filName = last(url)){
