@@ -19,8 +19,8 @@ const OS_PLATFORM_IS_WIN_OR_LINUX = OS_PLATFORM_IS_WIN || OS_PLATFORM_IS_LINUX;
 const OS_PLATFORM_IS_WIN_OR_DARWIN = OS_PLATFORM_IS_WIN || OS_PLATFORM_IS_DARWIN;
 
 const options = { recursive: true };
-const BIN = path.resolve( 'bin');
-const WORKSPACE = path.resolve('workspace');
+const BIN = path.resolve( __dirname, 'bin');
+const WORKSPACE = path.resolve(__dirname, 'workspace');
 const DIST_WORKSPACE_VIDEOS = path.resolve(WORKSPACE, 'videos');
 const DIST_WORKSPACE_WATERMARKS = path.resolve(WORKSPACE, 'watermarks');
 
@@ -30,16 +30,16 @@ fs.mkdirSync(DIST_WORKSPACE_VIDEOS, options);
 fs.mkdirSync(DIST_WORKSPACE_WATERMARKS, options);
 
 const CLI_DIRNAME = `bin`;
-const CLI_DIR_PATH = path.resolve(CLI_DIRNAME);
+const CLI_DIR_PATH = path.resolve(__dirname, CLI_DIRNAME);
 const WORKSPACE_DIRNAME = `workspace`;
-const WORKSPACE_DIR_PATH = path.resolve(WORKSPACE_DIRNAME);
-const WATERMARKS_DIR_PATH = path.resolve(WORKSPACE_DIRNAME, 'watermarks');
-const VIDEOS_DIR_PATH = path.resolve(WORKSPACE_DIRNAME, 'videos');
+const WORKSPACE_DIR_PATH = path.resolve(__dirname, WORKSPACE_DIRNAME);
+const WATERMARKS_DIR_PATH = path.resolve(WORKSPACE_DIR_PATH, 'watermarks');
+const VIDEOS_DIR_PATH = path.resolve(WORKSPACE_DIR_PATH, 'videos');
 
 const POSTFIX = OS_PLATFORM_IS_WIN ? ".exe" : "";
 const YTDLP_URL = `https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp${POSTFIX}`;
 const YTDLP_FILENAME = last(YTDLP_URL);
-const YTDLP_PATH = path.resolve(CLI_DIRNAME, YTDLP_FILENAME);
+const YTDLP_PATH = path.resolve(CLI_DIR_PATH, YTDLP_FILENAME);
 
 const FFMPEG_URL_PART_PLATFORM_MAP = {
     win32: "win" + os.arch().replace('x',''),
@@ -57,8 +57,8 @@ const FFMPEG_URL_PLATFORM_MAP = {
 };
 const FFMPEG_ZIP_URL = FFMPEG_URL_PLATFORM_MAP[OS_PLATFORM];
 const FFMPEG_ZIP_FILENAME = last(FFMPEG_ZIP_URL);
-const FFMPEG_ZIP_FILEPATH = path.resolve(CLI_DIRNAME, FFMPEG_ZIP_FILENAME);
-const FFMPEG_DIR_PATH = path.resolve(CLI_DIRNAME, lastDir(FFMPEG_ZIP_FILENAME), 'bin');
+const FFMPEG_ZIP_FILEPATH = path.resolve(CLI_DIR_PATH, FFMPEG_ZIP_FILENAME);
+const FFMPEG_DIR_PATH = path.resolve(CLI_DIR_PATH, lastDir(FFMPEG_ZIP_FILENAME), 'bin');
 const FFMPEG_PATH = path.resolve(OS_PLATFORM_IS_WIN_OR_LINUX ? FFMPEG_DIR_PATH : CLI_DIR_PATH, `ffmpeg${POSTFIX}`);
 
 const PARAMS = ['url', 'gap', 'scale', 'watermark'];
@@ -149,7 +149,7 @@ async function setupCLIs(){
 }
 
 async function downloadAsCliIfNot(url){
-    const fileName = path.resolve( CLI_DIRNAME, last(url) );
+    const fileName = path.resolve( CLI_DIR_PATH, last(url) );
 
     await downloadIfNot(url, fileName);
 
@@ -180,7 +180,7 @@ function download(url, fileName = last(url)){
 }
 
 function isUrlDownloaded(url, filName = last(url)){
-    const filePath = path.resolve(CLI_DIRNAME, filName);
+    const filePath = path.resolve(CLI_DIR_PATH, filName);
 
     return fs.existsSync(filePath)
 }
