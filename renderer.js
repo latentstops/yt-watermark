@@ -13,6 +13,10 @@ const exec = util.promisify(require('child_process').exec);
 
 const OS_PLATFORM = os.platform();
 const OS_PLATFORM_IS_WIN = OS_PLATFORM === "win32";
+const OS_PLATFORM_IS_DARWIN = OS_PLATFORM === "darwin";
+const OS_PLATFORM_IS_LINUX = OS_PLATFORM === "linux";
+const OS_PLATFORM_IS_WIN_OR_LINUX = OS_PLATFORM_IS_WIN || OS_PLATFORM_IS_LINUX;
+const OS_PLATFORM_IS_WIN_OR_DARWIN = OS_PLATFORM_IS_WIN || OS_PLATFORM_IS_DARWIN;
 
 const options = { recursive: true };
 const BIN = path.resolve( 'bin');
@@ -37,19 +41,25 @@ const YTDLP_URL = `https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-
 const YTDLP_FILENAME = last(YTDLP_URL);
 const YTDLP_PATH = path.resolve(CLI_DIRNAME, YTDLP_FILENAME);
 
-const FFMPEG_URL_PLATFORM_MAP = {
+const FFMPEG_URL_PART_PLATFORM_MAP = {
     win32: "win" + os.arch().replace('x',''),
-    darwin: "linux" + os.arch().replace('x',''),
     linux: "linux" + os.arch().replace('x',''),
 };
-const FFMPEG_ZIP_URL_OS_ARCH = FFMPEG_URL_PLATFORM_MAP[OS_PLATFORM];
+const FFMPEG_ZIP_URL_OS_ARCH = FFMPEG_URL_PART_PLATFORM_MAP[OS_PLATFORM];
 const FFMPEG_URL_ARCHIVE_FILE_EXTENSION = OS_PLATFORM_IS_WIN ? `.zip` : '.tar.xz';
 const FFMPEG_URL_ARCHIVE_FILE_NAME = `${FFMPEG_ZIP_URL_OS_ARCH}-gpl${FFMPEG_URL_ARCHIVE_FILE_EXTENSION}`;
-const FFMPEG_ZIP_URL = `https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-${FFMPEG_URL_ARCHIVE_FILE_NAME}`;
+const FFMPEG_ZIP_URL_WIN_AND_LINUX = `https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-${FFMPEG_URL_ARCHIVE_FILE_NAME}`;
+const FFMPEG_ZIP_URL_MACOS = "https://evermeet.cx/ffmpeg/ffmpeg-6.0.zip";
+const FFMPEG_URL_PLATFORM_MAP = {
+    win32: FFMPEG_ZIP_URL_WIN_AND_LINUX,
+    linux: FFMPEG_ZIP_URL_WIN_AND_LINUX,
+    darwin: FFMPEG_ZIP_URL_MACOS
+};
+const FFMPEG_ZIP_URL = FFMPEG_URL_PLATFORM_MAP[OS_PLATFORM];
 const FFMPEG_ZIP_FILENAME = last(FFMPEG_ZIP_URL);
 const FFMPEG_ZIP_FILEPATH = path.resolve(CLI_DIRNAME, FFMPEG_ZIP_FILENAME);
 const FFMPEG_DIR_PATH = path.resolve(CLI_DIRNAME, lastDir(FFMPEG_ZIP_FILENAME), 'bin');
-const FFMPEG_PATH = path.resolve(FFMPEG_DIR_PATH, `ffmpeg${POSTFIX}`);
+const FFMPEG_PATH = path.resolve(OS_PLATFORM_IS_WIN_OR_LINUX ? FFMPEG_DIR_PATH : CLI_DIR_PATH, `ffmpeg${POSTFIX}`);
 
 const PARAMS = ['url', 'gap', 'scale', 'watermark'];
 const DEFAULTS = { gap: '0.1', scale: '0.1' };
@@ -256,7 +266,7 @@ function getBaseFileName(fileName){
 }
 
 function extractArchive(fileName, { dir }){
-    if(OS_PLATFORM_IS_WIN) return extractZip(...arguments);
+    if(OS_PLATFORM_IS_WIN_OR_DARWIN) return extractZip(...arguments);
     else return exec(`tar -xvf ${fileName} -C ${dir}`);
 }
 
