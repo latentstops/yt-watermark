@@ -79,15 +79,23 @@ async function go(e){
     e.preventDefault();
     try {
         setInfo();
+        setFileName('File name: empty');
 
         let {url, gap, scale, watermark} = processParams();
+        const { submit } = window;
 
         const watermarkFilePath = processWatermarkFile(window["watermark_file"]);
         const watermarkSelectPath = path.resolve(WATERMARKS_DIR_PATH, watermark);
 
         watermark = watermarkFilePath || watermarkSelectPath;
 
-        await applyWatermark({url, gap, scale, watermark});
+        submit.setAttribute('disabled', '');
+        await createWatermarkVideo({url, gap, scale, watermark}).catch(err => {
+            alert(err);
+            setInfo('', {percent: 0});
+        });
+        submit.removeAttribute('disabled');
+
     } catch (e){
         alert(e.message);
     }
@@ -111,7 +119,7 @@ function processWatermarkFile(fileInput){
     return toPath;
 }
 
-async function applyWatermark({url, watermark, gap, scale}) {
+async function createWatermarkVideo({url, watermark, gap, scale}) {
     setInfo('Extract file name', { percent: 25, animated: true, stripped: true });
     const ytdlpCommandArgs = `-S res,ext:${VIDEO_FORMAT}:m4a --recode ${VIDEO_FORMAT} --restrict-filenames --print filename ${url}`;
     const baseFileName = await ytdlp(ytdlpCommandArgs).then(sanitize).then(getBaseFileName);
@@ -254,7 +262,7 @@ function setInfo(txt = '', { percent, animated, append, stripped } = {}){
     stripped ? infoClassList.add(strippedClass) : infoClassList.remove(strippedClass);
 }
 
-function setFileName(name){
+function setFileName(name = ''){
     window.filename.innerHTML = name;
 }
 
