@@ -15,8 +15,8 @@ const OS_PLATFORM = os.platform();
 const OS_PLATFORM_IS_WIN = OS_PLATFORM === "win32";
 const OS_PLATFORM_IS_DARWIN = OS_PLATFORM === "darwin";
 const OS_PLATFORM_IS_LINUX = OS_PLATFORM === "linux";
-const OS_PLATFORM_IS_WIN_OR_LINUX = OS_PLATFORM_IS_WIN || OS_PLATFORM_IS_LINUX;
-const OS_PLATFORM_IS_WIN_OR_DARWIN = OS_PLATFORM_IS_WIN || OS_PLATFORM_IS_DARWIN;
+const OS_PLATFORM_IS_WIN_OR_LINUX = !OS_PLATFORM_IS_DARWIN;
+const OS_PLATFORM_IS_WIN_OR_DARWIN = !OS_PLATFORM_IS_LINUX;
 
 const options = { recursive: true };
 const BIN = path.resolve( __dirname, 'bin');
@@ -112,7 +112,7 @@ function processWatermarkFile(fileInput){
 }
 
 async function applyWatermark({url, watermark, gap, scale}) {
-    setInfo('Extracting video file name -> ');
+    setInfo('Extract file name', { percent: 25, animated: true, stripped: true });
     const ytdlpCommandArgs = `-S res,ext:${VIDEO_FORMAT}:m4a --recode ${VIDEO_FORMAT} --restrict-filenames --print filename ${url}`;
     const baseFileName = await ytdlp(ytdlpCommandArgs).then(sanitize).then(getBaseFileName);
     const fileName = `${baseFileName}.${VIDEO_FORMAT}`;
@@ -123,13 +123,13 @@ async function applyWatermark({url, watermark, gap, scale}) {
     const waterMarkedFileName = `WM_${fileName}`;
     const waterMarkedFilePath = path.resolve(VIDEOS_DIR_PATH,waterMarkedFileName);
 
-    appendInfo('Downloading video -> ');
+    setInfo('Download video', { percent: 50, animated: true, stripped: true });
     await ytdlp(`-S res,ext:mp4:m4a --recode mp4 --restrict-filenames ${url} -o ${filePath}`);
 
-    appendInfo('Applying watermark -> ');
+    setInfo('Apply watermark', { percent: 75, animated: true, stripped: true });
     await ffmpeg(`-y -i ${filePath} -i ${watermark} -filter_complex "[1][0]scale2ref=w=oh*mdar:h=ih*${scale}[logo][video];[video][logo]overlay=W-w-w*${gap}:H-h-h*${gap}" -preset ultrafast -async 1 -codec:a copy ${waterMarkedFilePath}`)
 
-    appendInfo('Done');
+    setInfo('Done', { percent: 100, animated: false });
 }
 
 function createCli(path){
@@ -240,12 +240,18 @@ function reload(){
     location.reload();
 }
 
-function setInfo(txt = ''){
-    window.info.innerHTML = txt;
-}
+function setInfo(txt = '', { percent, animated, append, stripped } = {}){
+    const { info } = window;
+    const animatedClass = 'progress-bar-animated';
+    const strippedClass = 'progress-bar-striped';
+    const infoClassList = info.classList;
 
-function appendInfo(txt){
-    window.info.innerHTML += `${txt}\n`;
+    info.ariaValueNow = percent;
+    info.style.width = `${percent}%`;
+
+    append ? info.innerHTML += txt : info.innerHTML = txt;
+    animated ? infoClassList.add(animatedClass) : infoClassList.remove(animatedClass);
+    stripped ? infoClassList.add(strippedClass) : infoClassList.remove(strippedClass);
 }
 
 function setFileName(name){
