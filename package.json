@@ -22,7 +22,7 @@
   "license": "CC0-1.0",
   "dependencies": {
     "extract-zip": "^2.0.1",
-    "follow-redirects": "^1.15.2",
+    "follow-redirects": "^1.15.3",
     "is-url": "^1.2.4",
     "node-clipboardy": "^1.0.3",
     "sanitize-filename": "^1.6.3"
