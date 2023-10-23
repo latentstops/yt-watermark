@@ -28,7 +28,7 @@
     "sanitize-filename": "^1.6.3"
   },
   "devDependencies": {
-    "electron": "^25.3.2",
+    "electron": "^27.0.2",
     "electron-builder": "^24.4.0",
     "electron-icon-builder": "^2.0.1"
   },
